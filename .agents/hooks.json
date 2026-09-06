@@ -1,0 +1,10 @@
+{
+  "startup-speed-test": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "python3 .agents/hooks/on_open.py"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-09-06 14:20:45",
+  "download_mbps": 1477.28,
+  "upload_mbps": 90.39,
+  "latency_ms": 10.67,
+  "responsiveness_rpm": 2238,
+  "endpoint": "uklon5-edge-fx-045.aaplimg.com",
+  "interface": "en13",
+  "status": "Online"
+}
