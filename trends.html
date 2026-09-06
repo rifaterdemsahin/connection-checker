@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Test History & Trends</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --text-heading: #f0f6fc;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: var(--text-heading);
+        }
+        .nav-links {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .chart-container {
+            position: relative;
+            height: 40vh;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #0d1117;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background-color: #21262d;
+            color: var(--text-heading);
+        }
+        td {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-links">
+        <a href="index.html">&larr; Back to Home</a>
+    </div>
+    <h1>Network Speed History & Trends</h1>
+    
+    <div class="chart-container">
+        <canvas id="speedChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="pingChart"></canvas>
+    </div>
+
+    <h2>Recent Speed Tests</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Download (Mbps)</th>
+                <th>Upload (Mbps)</th>
+                <th>Ping (ms)</th>
+            </tr>
+        </thead>
+        <tbody id="historyTableBody">
+            <!-- Data will be populated here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    Chart.defaults.color = '#8b949e';
+    Chart.defaults.borderColor = '#30363d';
+
+    async function loadData() {
+        try {
+            const response = await fetch('report.log?t=' + Date.now());
+            if (!response.ok) throw new Error("Failed to fetch");
+            const text = await response.text();
+            
+            const lines = text.split('\n');
+            const speedData = [];
+
+            lines.forEach(line => {
+                if (line.includes('- SpeedTest:')) {
+                    const parts = line.split(' - SpeedTest: ');
+                    const timestamp = parts[0];
+                    const metrics = parts[1].split(' | ');
+                    
+                    const dl = parseFloat(metrics[0].split(' ')[1]);
+                    const ul = parseFloat(metrics[1].split(' ')[1]);
+                    const ping = parseFloat(metrics[2].split(' ')[1]);
+                    
+                    speedData.push({ timestamp, dl, ul, ping });
+                }
+            });
+
+            if (speedData.length === 0) {
+                document.getElementById('historyTableBody').innerHTML = '<tr><td colspan="4">No speed test data found in log.</td></tr>';
+                return;
+            }
+
+            renderCharts(speedData);
+            renderTable(speedData);
+        } catch (error) {
+            console.error("Failed to load report.log", error);
+            document.getElementById('historyTableBody').innerHTML = '<tr><td colspan="4">Failed to load data. Make sure you are serving this file over a local server (e.g., using live server or python -m http.server).</td></tr>';
+        }
+    }
+
+    function renderCharts(data) {
+        const labels = data.map(d => d.timestamp);
+        const downloads = data.map(d => d.dl);
+        const uploads = data.map(d => d.ul);
+        const pings = data.map(d => d.ping);
+
+        // Speed Chart
+        new Chart(document.getElementById('speedChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Download (Mbps)',
+                        data: downloads,
+                        borderColor: '#58a6ff',
+                        backgroundColor: 'rgba(88, 166, 255, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Upload (Mbps)',
+                        data: uploads,
+                        borderColor: '#3fb950',
+                        backgroundColor: 'rgba(63, 185, 80, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Throughput Trends', color: '#f0f6fc' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Ping Chart
+        new Chart(document.getElementById('pingChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Ping (ms)',
+                        data: pings,
+                        borderColor: '#f85149',
+                        backgroundColor: 'rgba(248, 81, 73, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: 'Latency Trends', color: '#f0f6fc' }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('historyTableBody');
+        const reversedData = [...data].reverse();
+        
+        tbody.innerHTML = reversedData.map(d => `
+            <tr>
+                <td>${d.timestamp}</td>
+                <td>${d.dl.toFixed(2)}</td>
+                <td>${d.ul.toFixed(2)}</td>
+                <td>${d.ping.toFixed(2)}</td>
+            </tr>
+        `).join('');
+    }
+
+    // Initialize
+    loadData();
+</script>
+
+</body>
+</html>

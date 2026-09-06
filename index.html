@@ -425,7 +425,10 @@ cd connection-checker
     <div class="card">
       <h2>
         <span>Recent Connection Log</span>
-        <button onclick="loadReportLog()" class="btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem; margin-left: auto;">Refresh Log</button>
+        <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+          <a href="trends.html" class="btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">View Trends</a>
+          <button onclick="loadReportLog()" class="btn" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Refresh Log</button>
+        </div>
       </h2>
       <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.75rem;">
         Entries recorded by <code>check.sh</code> / <code>check.ps1</code> in <code>report.log</code>:
