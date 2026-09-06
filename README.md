@@ -3,15 +3,17 @@
 A lightweight, cross-platform tool to monitor your internet connection by pinging reliable DNS servers (Google `8.8.8.8` and Cloudflare `1.1.1.1`). Includes a bash script for macOS/Linux, a PowerShell script for Windows/PowerShell Core, and a web dashboard for GitHub Pages.
 
 🌐 **Live Web Dashboard**: [https://rifaterdemsahin.github.io/connection-checker/](https://rifaterdemsahin.github.io/connection-checker/)
+📊 **History & Trends Dashboard**: [https://rifaterdemsahin.github.io/connection-checker/trends.html](https://rifaterdemsahin.github.io/connection-checker/trends.html)
 
 ---
 
 ## Features
 
 - **macOS & Linux Support**: Native Bash script (`check.sh`) with colored output and latency display.
+- **Speed Test Capability**: Automated speed tests measuring throughput, latency, and responsiveness.
 - **Windows Support**: Cross-platform PowerShell script (`check.ps1`).
-- **Web Dashboard**: Interactive `index.html` with real-time connectivity testing and log history.
-- **Automatic Logging**: Results appended to `report.log` with timestamps.
+- **Web Dashboards**: Interactive `index.html` with real-time connectivity testing, and a `trends.html` dashboard with historical charts.
+- **Automatic Logging**: Results appended to `report.log` and `speedtest_report.json` with timestamps.
 - **GitHub Pages Integration**: Automatic deployment workflow included.
 
 ---
