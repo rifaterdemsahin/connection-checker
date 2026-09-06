@@ -15,7 +15,7 @@ foreach ($h in $hosts) {
     }
 }
 
-$logFile = "$PSScriptRoot\report.log"
+$logFile = Join-Path $PSScriptRoot "report.log"
 $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 
 if ($connected) {
